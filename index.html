@@ -1,51 +1,75 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script type="module">
-    import { Canvg } from "https://cdn.jsdelivr.net/npm/canvg@^4.0.0/+esm"
-
-    function convert(svg, name) {
-        let output = document.querySelector("a")
-        output.hidden = false
-        output.innerText = "Converting..."
-        const canvas = document.querySelector('canvas');
-        const ctx = canvas.getContext('2d');
-        const v = Canvg.fromString(ctx, svg);
-
-        v.start();
-
-		canvas.toBlob(function(blob) {
-      	    let url = URL.createObjectURL(blob);
-            output.href = url
-            output.innerText = "Click to Download " + name.replace(".svg", ".png")
-            output.download = name.replace(".svg", ".png")
-            document.getElementById("imgoutput").src = url
-            document.getElementById("imgoutput").hidden = false
-        })
-    };
-
-    document.getElementById("filepicker").addEventListener("change", handleFile)
-    
-    function handleFile() {
-        var file = document.getElementById("filepicker").files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.readAsText(file, "UTF-8");
-            reader.onload = function (evt) {
-                convert(evt.target.result, file.name);
-            }
-            reader.onerror = function (evt) {
-                alert("Error reading file")
-            }
-        }
-    }
-    </script>
   </head>
   <body>
+    <script type="module">
+        import { Canvg } from "https://cdn.jsdelivr.net/npm/canvg@^4.0.0/+esm"
+        //import { scale } from "https://cdn.jsdelivr.net/npm/scale-that-svg/+esm"
+
+        function convert(svg, name) {
+            let output = document.querySelector("a")
+            output.hidden = false
+            output.innerText = "Converting..."
+            const canvas = document.querySelector('canvas');
+            const ctx = canvas.getContext('2d');
+            const v = Canvg.fromString(ctx, svg);
+
+            v.start();
+
+            canvas.toBlob(function(blob) {
+                let url = URL.createObjectURL(blob);
+                output.href = url
+                output.innerText = "Click to Download " + name.replace(".svg", ".png")
+                output.download = name.replace(".svg", ".png")
+                document.getElementById("imgoutput").src = url
+                document.getElementById("imgoutput").hidden = false
+            })
+        };
+
+        // async function doScaling(data, name) {
+        //     let scaled = await scale(data, {scale: 0.5})
+        //     console.log("hi")
+        //     console.log(scaled)
+        // }
+        
+        function handleFile() {
+            var file = document.getElementById("filepicker").files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.readAsText(file, "UTF-8");
+                reader.onload = function (read) {
+                    // console.log(scale)
+                    // console.log(read.target.result)
+
+                    // doScaling(read.target.reult, file.name)
+                    convert(read.target.result, file.name)
+
+                }
+                reader.onerror = function (read) {
+                    alert("Error reading file")
+                }
+            }
+        }
+
+        document.getElementById("filepicker").addEventListener("change", function() {
+            // document.getElementById("scale-label").hidden = false
+            // document.getElementById("scale").hidden = false
+            document.getElementById("convert-button").hidden = false
+        });
+
+        document.getElementById("convert-button").addEventListener("click", handleFile)
+    </script>
+
     <canvas hidden></canvas>
     <span>Pick an .svg file to convert to .png</span>
     <br>
     <input type="file" accept=".svg" id="filepicker">
+    <br>
+    <label for="scale" id="scale-label" hidden>Scale</label>
+    <input type="text" value="1" id="scale" hidden>
+    <br>
+    <button id="convert-button" hidden>Convert!</button>
     <br>
     <a href="#" download="output" hidden>Converting...</a>
     <br>
